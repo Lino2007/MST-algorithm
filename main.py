@@ -84,7 +84,7 @@ def MST_PRIM (G, s):
     E_prim = []
     wh = 0
     while U != V:
-        node, edge, nv,found = find_node(G, U, V)
+        node, edge, nv, found = find_node(G, U, V)
         if found == False:
             raise Exception("Error, node hasn't been found, terminating MST_PRIM")
         U.append(node)
@@ -96,15 +96,20 @@ def MST_PRIM (G, s):
     print(wh)
     return [G, E_prim, wh]
 
+
+
 def print_result (MST):
     print("Minimum spanning tree has been found!")
     print("Edges of MST: " + str(MST[1]))
     print("Weight: " + str(MST[2]))
+
+
 
 G1,G2,G3,G4 = [], [], [], []
 exec(open("./grafovi.txt").read()) # ucitava grafove
 MST = MST_PRIM(G1, 0)
 draw_graph(MST)
 print_result(MST)
+
 
 
