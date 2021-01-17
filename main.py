@@ -35,21 +35,17 @@ def draw_graph(MST):
             l, r = edge[0], edge[1]
             if l > r:
                 l, r = r, l
-            # G.add_edge("x" + str(l), "x" + str(r), color="red", weight=3)
             G.add_edge(l, r, color="red", weight=3)
-            # edge_list.append([l ,r])
         else:
             edge_p = edge[1], edge[0]
             if edge_p not in MST[1] and edge_p not in edge_list:
-                # G.add_edge("x" + str(edge[0]), "x" + str(edge[1]), color="black", weight=1)
                 G.add_edge(edge[0], edge[1], color="black", weight=1)
-                # edge_list.append([edge[0], edge[1]])
 
     colors = nx.get_edge_attributes(G, 'color').values()
     weights = nx.get_edge_attributes(G, 'weight').values()
     # draw graph
 
-    print(G.nodes)
+
     pos = nx.shell_layout(G)
     nx.draw(G, pos, edge_color=colors, width=list(weights), with_labels=True)
 
@@ -59,42 +55,36 @@ def draw_graph(MST):
     plt.show()
 
 
-def find_node (G, U, V):
-    difference = [item for item in V if item not in U] # V - U
-    string = ""
-    minimum_weight, u, v, found = sys.maxsize, 0, 0, False
-    for x_axis in V:
-        for y_axis in V:
-            if x_axis != y_axis and G[x_axis][y_axis] != sys.maxsize:
-                if x_axis in U and y_axis in difference:
-                    weight = G[x_axis][y_axis]
-                    if weight < minimum_weight:
-                       # string += str(G[x_axis][y_axis]) + " "
-                        minimum_weight, u, v = weight, x_axis, y_axis
-        #string += "\n"
-    print(minimum_weight)
-    if minimum_weight != sys.maxsize:
-        found = True
+def pronadji_min (G, U, V):
+    razlika = [item for item in V if item not in U]
+    min, u, v, postoji = inf, 0, 0, False
 
-    return v, (u, v), minimum_weight,found
+    for c_u in U:
+        for c_v in V:
+            if G[c_u][c_v] != sys.maxsize and c_v in razlika:
+                    tezina = G[c_u][c_v]
+                    if tezina < min:
+                        min, u, v = tezina, c_u, c_v
+    if min != inf:
+        postoji = True
+
+    return v, (u, v), min, postoji
 
 def MST_PRIM (G, s):
-    V = [*range(0, len(G), 1)]
-    U = [s]
-    E_prim = []
-    wh = 0
+    V = {*range(0, len(G), 1)}
+    U = {s}
+    E_prim = set()
+    ukupna_tezina = 0
     while U != V:
-        node, edge, nv, found = find_node(G, U, V)
-        if found == False:
-            raise Exception("Error, node hasn't been found, terminating MST_PRIM")
-        U.append(node)
-        U.sort()
-        E_prim.append(edge)
-        wh += nv
+        cvor, min_grana, tezina, postoji = pronadji_min(G, U, V)
+        if not postoji:
+            raise Exception("Cvor nije pronadjen, prekidam izvrsenje!")
+        U.add(cvor)
+        E_prim.add(min_grana)
+        draw_graph([G, E_prim, 0]) #crtaj u svakoj iteraciji
+        ukupna_tezina += tezina
+    return [G, E_prim, ukupna_tezina]
 
-    print(E_prim)
-    print(wh)
-    return [G, E_prim, wh]
 
 
 
@@ -107,9 +97,10 @@ def print_result (MST):
 
 G1,G2,G3,G4 = [], [], [], []
 exec(open("./grafovi.txt").read()) # ucitava grafove
-MST = MST_PRIM(G1, 0)
+MST = MST_PRIM(G4, 0)
 draw_graph(MST)
 print_result(MST)
+
 
 
 
